@@ -114,6 +114,16 @@ int libpff_record_set_get_entry_by_utf16_name(
      uint8_t flags,
      libcerror_error_t **error );
 
+LIBPFF_EXTERN \
+int libpff_record_set_get_entry_name_by_index(
+    libpff_record_set_t* record_set,
+    uint32_t  entry_index,
+    uint32_t* entry_type,
+    size_t* entry_len,
+    uint8_t** entry,
+    libcerror_error_t** error);
+
+
 #if defined( __cplusplus )
 }
 #endif

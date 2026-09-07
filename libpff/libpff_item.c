@@ -47,6 +47,14 @@
 #include "libpff_types.h"
 #include "libpff_value_type.h"
 
+int libpff_record_set_get_entry_name_by_index(
+	libpff_record_set_t* record_set,
+	uint32_t  entry_index,
+	uint32_t* entry_type,
+	size_t* entry_len,
+	uint8_t** entry,
+	libcerror_error_t** error);
+
 /* Creates an item
  * Make sure the value item is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -1562,6 +1570,68 @@ on_error:
 	}
 	return( -1 );
 }
+
+
+// ------------------------------------- Start Vound 
+int libpff_item_get_map_to_id_entry_by_index(
+	libpff_item_t* item,
+	int set_index,
+	int entry_index,
+	uint32_t* value_type,
+	uint8_t** value_data,
+	size_t* value_data_size,
+	libcerror_error_t** error) 
+{
+
+	static char* function = "libpff_item_get_entry_value_by_index";
+	int number_of_record_sets = 0;
+	libpff_record_set_t *record_set = NULL;
+
+	int result = libpff_item_get_number_of_record_sets(item, &number_of_record_sets, error);
+
+	if (result == -1) {
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve number of record sets for item: %d.",
+			function);
+
+		return(-1);
+	}
+
+	if (set_index >= number_of_record_sets) {
+
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: record set number [%d] exceeded for item: %d.",
+			set_index, function);
+
+		return(-1);
+
+	}
+
+	result = libpff_item_get_record_set_by_index(item, set_index, &record_set, error);
+
+	if (result == 1) {
+
+		result = libpff_record_set_get_entry_name_by_index(record_set, entry_index, value_type, value_data, value_data_size, error);
+			
+		if (result == 1) {
+
+			return 1;
+
+		}
+	}
+
+	return result;
+
+}
+
+//------------------------------- End Vound
+
 
 /* Retrieves the UTF-16 string size of a specific entry
  * The size includes the end of string character
