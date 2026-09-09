@@ -857,7 +857,7 @@ int libpff_record_set_get_entry_by_utf8_name(
 
 				return( -1 );
 			}
-			else if( result != 0 )
+			else if( result == LIBUNA_COMPARE_EQUAL)
 			{
 				if( ( ( flags & LIBPFF_ENTRY_VALUE_FLAG_MATCH_ANY_VALUE_TYPE ) != 0 )
 				 || ( internal_record_entry->identifier.value_type == value_type ) )
@@ -1008,7 +1008,7 @@ int libpff_record_set_get_entry_by_utf16_name(
 
 				return( -1 );
 			}
-			else if( result != 0 )
+			else if( result == 0 )
 			{
 				if( ( ( flags & LIBPFF_ENTRY_VALUE_FLAG_MATCH_ANY_VALUE_TYPE ) != 0 )
 				 || ( internal_record_entry->identifier.value_type == value_type ) )
@@ -1025,3 +1025,111 @@ int libpff_record_set_get_entry_by_utf16_name(
 	return( 0 );
 }
 
+// ------------------------ Vound start
+
+int libpff_record_set_get_entry_name_by_index(
+	libpff_record_set_t* record_set,
+	uint32_t  entry_index, 
+	uint32_t * entry_type,
+	size_t * entry_len,
+	uint8_t ** entry,
+	libcerror_error_t** error)
+{
+	libpff_internal_record_entry_t* internal_record_entry = NULL;
+	libpff_internal_record_set_t* internal_record_set = NULL;
+	static char* function = "libpff_record_set_get_entry_by_utf8_name";
+	int number_of_entries = 0;
+	int result = 0;
+
+	if (record_set == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid record set.",
+			function);
+
+		return(-1);
+	}
+	internal_record_set = (libpff_internal_record_set_t*)record_set;
+
+	if (entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid record entry.",
+			function);
+
+		return(-1);
+	}
+	if (libcdata_array_get_number_of_entries(
+		internal_record_set->entries_array,
+		&number_of_entries,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve number of entries.",
+			function);
+
+		return(-1);
+	}
+
+	if (entry_index < number_of_entries) {
+
+		if (libcdata_array_get_entry_by_index(
+			internal_record_set->entries_array,
+			entry_index,
+			(intptr_t**)&internal_record_entry,
+			error) != 1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				"%s: unable to retrieve record entry: %d.",
+				function,
+				entry_index);
+
+			return(-1);
+		}
+		if (internal_record_entry == NULL)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				"%s: missing data record entry: %d.",
+				function,
+				entry_index);
+
+			return(-1);
+		}
+
+		if ((internal_record_entry->name_to_id_map_entry != NULL)
+			&& (internal_record_entry->name_to_id_map_entry->type == LIBPFF_NAME_TO_ID_MAP_ENTRY_TYPE_STRING))
+		{
+			if (internal_record_entry->name_to_id_map_entry->string_value != NULL) {
+				*entry_len = internal_record_entry->name_to_id_map_entry->value_size;
+				*entry_type = internal_record_entry->name_to_id_map_entry->type;
+				*entry = internal_record_entry->name_to_id_map_entry->string_value;
+				
+				return(1);
+			}
+
+		}
+	}
+	else {
+		return(-1);
+	}
+	*entry = NULL;
+
+	return(0);
+}
+
+// ----------------------------------------------- Vound End

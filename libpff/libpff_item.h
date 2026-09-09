@@ -171,6 +171,22 @@ int libpff_internal_item_get_entry_value_32bit_integer(
      uint32_t *value_32bit,
      libcerror_error_t **error );
 
+// VOUND ------------------------ Investigation start 
+
+LIBPFF_EXTERN \
+int libpff_item_get_map_to_id_entry_by_index(
+    libpff_item_t* item,
+    int set_index,
+    int entry_index,
+    uint32_t* value_type,
+    uint8_t** value_data,
+    size_t* value_data_size,
+    libcerror_error_t** error);
+
+// ------------------ VOUND Investigation end 
+
+
+
 int libpff_internal_item_get_entry_value_filetime(
      libpff_internal_item_t *internal_item,
      uint32_t entry_type,
